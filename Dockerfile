@@ -6,10 +6,13 @@ LABEL org.opencontainers.image.authors="homebridge"
 LABEL org.opencontainers.image.url="https://github.com/homebridge/docker-homebridge"
 LABEL org.opencontainers.image.licenses="GPL-3.0"
 
-# update to latest releases prior to release
+# Latest release is supplied as a build argument
 
-ENV HOMEBRIDGE_PKG_VERSION=v1.2.1 \
-  FFMPEG_VERSION=v2.1.1
+ARG HOMEBRIDGE_APT_PKG_VERSION
+ARG FFMPEG_VERSION
+
+ENV HOMEBRIDGE_APT_PKG_VERSION=${HOMEBRIDGE_APT_PKG_VERSION:-v1.2.1}
+ENV FFMPEG_VERSION=${FFMPEG_VERSION:-v2.1.1}
 
 ENV S6_OVERLAY_VERSION=3.1.1.2 \
  S6_CMD_WAIT_FOR_SERVICES_MAXTIME=0 \
@@ -65,9 +68,9 @@ RUN case "$(uname -m)" in \
     *) echo "unsupported architecture"; exit 1 ;; \
     esac \
   && set -x \
-  && curl -sSLf -o /homebridge_${HOMEBRIDGE_PKG_VERSION}.deb https://github.com/homebridge/homebridge-apt-pkg/releases/download/${HOMEBRIDGE_PKG_VERSION}/homebridge_${HOMEBRIDGE_PKG_VERSION}_${DEB_ARCH}.deb \
-  && dpkg -i /homebridge_${HOMEBRIDGE_PKG_VERSION}.deb \
-  && rm -rf /homebridge_${HOMEBRIDGE_PKG_VERSION}.deb \
+  && curl -sSLf -o /homebridge_${HOMEBRIDGE_APT_PKG_VERSION}.deb https://github.com/homebridge/homebridge-apt-pkg/releases/download/${HOMEBRIDGE_APT_PKG_VERSION}/homebridge_${HOMEBRIDGE_APT_PKG_VERSION}_${DEB_ARCH}.deb \
+  && dpkg -i /homebridge_${HOMEBRIDGE_APT_PKG_VERSION}.deb \
+  && rm -rf /homebridge_${HOMEBRIDGE_APT_PKG_VERSION}.deb \
   && chown -R root:root /opt/homebridge \
   && rm -rf /var/lib/homebridge
 

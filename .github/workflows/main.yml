@@ -49,6 +49,19 @@ jobs:
         echo $VERSION_IMAGE_TAG
         echo "VERSION_IMAGE_TAG=${VERSION_IMAGE_TAG}" >> $GITHUB_OUTPUT
 
+    - name: Set Package Versions
+      id: pkg_version
+      run: |
+        get_latest_release() {
+          curl --silent "https://api.github.com/repos/$1/releases/latest" | # Get latest release from GitHub api
+            grep '"tag_name":' |                                            # Get tag line
+            sed -E 's/.*"([^"]+)".*/\1/'                                    # Pluck JSON value
+        }
+        export HOMEBRIDGE_APT_PKG_VERSION=`get_latest_release "homebridge/homebridge-apt-pkg"`
+        export FFMPEG_VERSION=`get_latest_release "homebridge/ffmpeg-for-homebridge"`
+        echo "HOMEBRIDGE_APT_PKG_VERSION=${HOMEBRIDGE_APT_PKG_VERSION}" >> $GITHUB_OUTPUT
+        echo "FFMPEG_VERSION=${FFMPEG_VERSION}" >> $GITHUB_OUTPUT
+
     - name: Log into GitHub Container registry
       uses: docker/login-action@v3
       with:
@@ -63,6 +76,9 @@ jobs:
         file: ./Dockerfile
         platforms: linux/amd64,linux/arm/v7,linux/arm64
         push: true
+        build-args: |
+          HOMEBRIDGE_APT_PKG_VERSION=${{ steps.pkg_version.outputs.HOMEBRIDGE_APT_PKG_VERSION }}
+          FFMPEG_VERSION=${{ steps.pkg_version.outputs.FFMPEG_VERSION }}
         tags: |
           ghcr.io/homebridge/homebridge:latest
           ghcr.io/homebridge/homebridge:ubuntu
@@ -84,6 +100,9 @@ jobs:
         file: ./Dockerfile
         platforms: linux/amd64,linux/arm/v7,linux/arm64
         push: true
+        build-args: |
+          HOMEBRIDGE_APT_PKG_VERSION=${{ steps.pkg_version.outputs.HOMEBRIDGE_APT_PKG_VERSION }}
+          FFMPEG_VERSION=${{ steps.pkg_version.outputs.FFMPEG_VERSION }}
         tags: |
           homebridge/homebridge:latest
           homebridge/homebridge:ubuntu
