@@ -104,9 +104,9 @@ jobs:
           HOMEBRIDGE_APT_PKG_VERSION=${{ steps.pkg_version.outputs.HOMEBRIDGE_APT_PKG_VERSION }}
           FFMPEG_VERSION=${{ steps.pkg_version.outputs.FFMPEG_VERSION }}
         tags: |
-          homebridge/homebridge:latest
-          homebridge/homebridge:ubuntu
-          homebridge/homebridge:${{ steps.image_tag.outputs.IMAGE_TAG }}
+          jakepez/homebridge:latest
+          jakepez/homebridge:ubuntu
+          jakepez/homebridge:${{ steps.image_tag.outputs.IMAGE_TAG }}
 
   tag:
     name: Verify Release Tag
